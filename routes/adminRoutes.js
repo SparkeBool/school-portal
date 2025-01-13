@@ -10,7 +10,8 @@ const { createPupil,
         unassignSubject,
         deleteSubject,
         getAcademicYear,
-        addAcademicYear} = require('../controller/AdminController');
+        addAcademicYear,
+        getAssignedSubjects} = require('../controller/AdminController');
 
 const authMiddleware = require('../middleware/authMiddleware');
 const { createSubject, getAllSubjects } = require('../controller/subjectController');
@@ -38,13 +39,15 @@ router.delete('/pupil/:pupilId', authMiddleware(['admin']), deletePupil);
 router.post('/subject/assign-pupil', authMiddleware(['admin']), assignSubject);
 router.get('/pupils/assignments', authMiddleware(['admin']), getAssignedPupils);
 router.delete('/subject/unassign-pupil', authMiddleware(['admin']), unassignSubject);
+router.get('/pupils/:pupilId/subjects', getAssignedSubjects);
+
 //create subjects route
 router.get('/subjects', authMiddleware(['admin']), getAllSubjects);
 router.post('/create-subject', authMiddleware(['admin']), createSubject);
 router.delete('/subjects/:subjectId', authMiddleware(['admin']), deleteSubject);
 
 //Academic Year routes
-router.get('/academic-years', authMiddleware(['admin']), getAcademicYear);
+router.get('/academic-years', authMiddleware(['admin', 'pupils']), getAcademicYear);
 router.post('/add-academic-year', authMiddleware(['admin']), addAcademicYear);
 
 

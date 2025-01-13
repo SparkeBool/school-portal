@@ -10,6 +10,7 @@ const fs = require('fs');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const pupilRoutes = require('./routes/pupilRoutes');
+const resultRoutes = require('./routes/resultRoutes');
 const dbConnect = require('./config/db');
 
 // App initialization
@@ -40,6 +41,7 @@ app.use("/", express.static(path.join(__dirname +'/public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/pupil', pupilRoutes);
+app.use('/api/results', resultRoutes);
 
 // MongoDB connection
 const PORT = process.env.PORT || 5000;

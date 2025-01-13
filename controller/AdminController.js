@@ -1,3 +1,4 @@
+const academicYear = require('../models/academicYear');
 const Pupil = require('../models/Pupil');
 const Subject = require('../models/Subject');
 const bcrypt = require('bcryptjs');
@@ -273,16 +274,36 @@ exports.deleteSubject = async (req, res) => {
   }
 };
 
+// Fetch subjects assigned to a specific pupil
+exports.getAssignedSubjects = async (req, res) => {
+  try {
+    const { pupilId } = req.params;
+    
+    // Assuming there's a 'subjects' field in the Pupil model that stores assigned subjects
+    const pupil = await Pupil.findById(pupilId).populate('subjects');
+
+    if (!pupil) {
+      return res.status(404).json({ error: 'Pupil not found' });
+    }
+
+    res.json({ subjects: pupil.subjects });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch assigned subjects' });
+  }
+};
+
+
 // Fetch all academic years
 exports.getAcademicYear = async (req, res) => {
-  const years = await AcademicYear.find();
+  const years = await academicYear.find();
   res.json(years);
 };
 
 // Add a new academic year
 exports.addAcademicYear = async (req, res) => {
   const { year } = req.body;
-  const newYear = new AcademicYear({ year });
+  const newYear = new academicYear({ year });
   await newYear.save();
   res.json(newYear);
 };

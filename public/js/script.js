@@ -28,46 +28,62 @@ document.querySelector('.logout-link').addEventListener('click', function(e) {
     window.location.href = "/login";  // Redirect to login page
 });
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     const deleteButtons = document.querySelectorAll('.delete-btn');
-//     deleteButtons.forEach(button => {
-//         button.addEventListener('click', () => {
-//             if (confirm('Are you sure you want to delete this pupil?')) {
-//                 // Add delete functionality here
-//                 alert('Pupil deleted!');
-//             }
-//         });
-//     });
+const apiUrl = 'http://localhost:5000/api/admin'; // Backend API URL
+const dropdownElement = document.getElementById('academic-years-dropdown');
+const newYearInput = document.getElementById('new-year');
+const addYearButton = document.getElementById('add-year-btn');
+const errorMessage = document.getElementById('error-message');
 
-//     const addButton = document.querySelector('.add-btn');
-//     const cancelButton = document.querySelector('#cancel');
-//     const pupilForm = document.querySelector('.pupil-form');
-    
-//     if (addButton && cancelButton && pupilForm) {
-//         // Event listener for the Add button
-//         addButton.addEventListener('click', () => {
-//             addButton.style.display = 'none';
-//             cancelButton.style.display = 'block';
-//             pupilForm.style.display = 'block'; // Show the form
-//             console.log('Pupil form displayed');
-//         });
-    
-//         // Event listener for the Cancel button
-//         cancelButton.addEventListener('click', () => {
-//             addButton.style.display = 'block';
-//             cancelButton.style.display = 'none';
-//             pupilForm.style.display = 'none'; // Hide the form
-//             console.log('Pupil form hidden');
-//         });
-//     } else {
-//         console.error('Required elements not found');
-//     }
-    
+// Fetch and populate academic years in the dropdown
+async function fetchAcademicYears() {
+  try {
+    const response = await axios.get(`${apiUrl}/academic-years`);
+    const academicYears = response.data;
 
-//     const editButtons = document.querySelectorAll('.edit-btn');
-//     editButtons.forEach(button => {
-//         button.addEventListener('click', () => {
-//             alert('Edit pupil functionality not implemented yet!');
-//         });
-//     });
-// });
+    academicYears.sort((a, b) => {
+        const yearA = parseInt(a.year, 10); // Convert to number for proper sorting
+        const yearB = parseInt(b.year, 10);
+        return yearB - yearA; // Descending order
+      });
+      
+    dropdownElement.innerHTML = ''; // Clear existing options
+    academicYears.forEach((year) => {
+      const option = document.createElement('option');
+      option.value = year._id; // Use the ID as the value
+      option.textContent = year.year;
+      dropdownElement.appendChild(option);
+    });
+  } catch (error) {
+    console.error('Error fetching academic years:', error);
+    errorMessage.textContent = 'Failed to fetch academic years.';
+  }
+}
+
+// Add a new academic year
+async function addAcademicYear() {
+  const newYear = newYearInput.value.trim();
+  if (!newYear) {
+    errorMessage.textContent = 'Please enter a valid year.';
+    return;
+  }
+  try {
+    const response = await axios.post(apiUrl, { year: newYear });
+    const addedYear = response.data;
+    // Add the new year to the dropdown
+    const option = document.createElement('option');
+    option.value = addedYear._id;
+    option.textContent = addedYear.year;
+    dropdownElement.appendChild(option);
+    newYearInput.value = ''; // Clear input
+    errorMessage.textContent = ''; // Clear error message
+  } catch (error) {
+    console.error('Error adding academic year:', error);
+    errorMessage.textContent = 'Failed to add academic year.';
+  }
+}
+
+// Event listeners
+addYearButton.addEventListener('click', addAcademicYear);
+
+// Fetch academic years on page load
+fetchAcademicYears();

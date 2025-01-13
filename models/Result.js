@@ -11,6 +11,16 @@ const ResultSchema = new mongoose.Schema({
     ref: 'Subject',
     required: true,
   },
+  academicYear: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AcademicYear',
+    required: true,
+  },
+  term: {
+    type: String, // Example: "First Term", "Second Term", "Third Term"
+    required: true,
+    enum: ["First Term", "Second Term", "Third Term"], // Limit to valid options
+  },
   marks: {
     type: Number,
     required: true,
