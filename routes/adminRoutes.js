@@ -11,12 +11,18 @@ const { createPupil,
         deleteSubject,
         getAcademicYear,
         addAcademicYear,
-        getAssignedSubjects} = require('../controller/AdminController');
+        getAssignedSubjects,
+        getStats} = require('../controller/AdminController');
 
 const authMiddleware = require('../middleware/authMiddleware');
 const { createSubject, getAllSubjects } = require('../controller/subjectController');
 
 const router = express.Router();
+
+//get stats
+router.get('/fetch-stats', getStats);
+
+
 
 // Route: Create a new pupil (Admin-only)
 router.post('/create-pupil', authMiddleware(['admin']), createPupil);

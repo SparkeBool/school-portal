@@ -113,17 +113,19 @@ hr {
 #resultsTable td {
     padding: 12px;
     text-align: center;
+    color: white;
     border: 1px solid #ddd;
     word-wrap: break-word;
 }
 
 #resultsTable th {
     background-color: #055e4a;
+    color:white;
     font-weight: 600;
 }
 
-#resultsTable tbody tr:hover {
-    background-color: #f1f1f1;
+#resultsTable tr:hover {
+     cursor: pointer;
 }
 
 /* Table responsiveness */
@@ -285,6 +287,7 @@ button[type="submit"]:hover {
                         <thead>
                             <tr>
                                 <th>Pupil</th>
+                                <th>Class</th>
                                 <th>Subject</th>
                                 <th>Marks</th>
                                 <th>Grade</th>
@@ -307,7 +310,48 @@ button[type="submit"]:hover {
             </div>
             
         
-            
+            <!-- Edit Result Modal -->
+<div class="modal fade" id="editResultModal" tabindex="-1" aria-labelledby="editResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editResultModalLabel">Edit Result</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editResultForm">
+            <input type="hidden" id="editResultId">
+            <div class="mb-3">
+              <label for="editPupilName" class="form-label">Pupil Name</label>
+              <input type="text" class="form-control" id="editPupilName" readonly>
+            </div>
+            <div class="mb-3">
+              <label for="editSubject" class="form-label">Subject</label>
+              <input type="text" class="form-control" id="editSubject" readonly>
+            </div>
+            <div class="mb-3">
+              <label for="editMarks" class="form-label">Marks</label>
+              <input type="number" class="form-control" id="editMarks" min="0" max="100">
+            </div>
+            <div class="mb-3">
+              <label for="editTerm" class="form-label">Term</label>
+              <select class="form-select" id="editTerm">
+                <option value="First Term">First Term</option>
+                <option value="Second Term">Second Term</option>
+                <option value="Third Term">Third Term</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editAcademicYear" class="form-label">Academic Year</label>
+              <input type="text" class="form-control" id="editAcademicYear" readonly>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Result</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
         </main>
     </div>
     <!-- <script src="js/script.js"></script> -->

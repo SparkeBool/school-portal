@@ -82,6 +82,27 @@ async function addAcademicYear() {
   }
 }
 
+async function fetchStats() {
+  try {
+    // Call the stats API to get total pupils, subjects, and results
+    const response = await axios.get(`${apiUrl}/fetch-stats`);
+
+    // Extract data from the response
+    const { totalPupils, totalSubjects, totalResults } = response.data;
+
+    // Update the DOM with the fetched data
+    document.getElementById('total-pupils').textContent = totalPupils;
+    document.getElementById('total-subjects').textContent = totalSubjects;
+    document.getElementById('total-results').textContent = totalResults;
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+  }
+}
+
+// Call the fetchStats function when the page loads
+document.addEventListener('DOMContentLoaded', fetchStats);
+
+
 // Event listeners
 addYearButton.addEventListener('click', addAcademicYear);
 

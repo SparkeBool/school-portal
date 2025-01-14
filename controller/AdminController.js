@@ -1,5 +1,6 @@
 const academicYear = require('../models/academicYear');
 const Pupil = require('../models/Pupil');
+const Result = require('../models/Result');
 const Subject = require('../models/Subject');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -306,4 +307,22 @@ exports.addAcademicYear = async (req, res) => {
   const newYear = new academicYear({ year });
   await newYear.save();
   res.json(newYear);
+};
+
+exports.getStats = async (req, res) => {
+  try {
+    // Get total number of pupils, subjects, and results
+    const totalPupils = await Pupil.countDocuments();
+    const totalSubjects = await Subject.countDocuments();
+    const totalResults = await Result.countDocuments();
+
+    res.status(200).json({
+      totalPupils,
+      totalSubjects,
+      totalResults
+    });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ message: 'An error occurred while fetching statistics' });
+  }
 };

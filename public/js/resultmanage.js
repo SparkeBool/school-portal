@@ -148,3 +148,147 @@ document.addEventListener('click', (e) => {
     pupilSuggestions.style.display = 'none';
   }
 });
+
+const resultsList = document.getElementById('resultsList');
+const prevPageBtn = document.getElementById('prevPageBtn');
+const nextPageBtn = document.getElementById('nextPageBtn');
+const pageInfo = document.getElementById('pageInfo');
+
+let currentPage = 1;
+let totalPages = 1;
+
+async function fetchResults(page = 1) {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/results/all-results`, {
+      params: { page, limit: 25 },
+    });
+
+    const results = response.data.results;
+    totalPages = response.data.totalPages;
+    currentPage = response.data.currentPage;
+
+    // Clear the table body
+    resultsList.innerHTML = '';
+
+    // Debug: Log the results to check structure
+    // console.log('Results:', results);
+
+    // Populate the table with results
+    results.forEach((result) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${result.pupil.name}</td>
+        <td>${result.pupil.class}</td>
+        <td>${result.subject.name}</td>
+        <td>${result.marks}</td>
+        <td>${result.grade}</td>
+        <td>${result.academicYear ? result.academicYear.year || "N/A" : "N/A"}</td>
+        <td>${result.term}</td>
+        <td>
+      <button class="btn btn-sm btn-warning" onclick="editResult('${result._id}')">Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteResult('${result._id}')">Delete</button>
+    </td>
+
+      `;
+      resultsList.appendChild(row);
+    });
+
+    // Update pagination controls
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages;
+  } catch (error) {
+    console.error('Error fetching results:', error);
+  }
+}
+
+
+// Pagination buttons logic
+prevPageBtn.addEventListener('click', () => {
+  if (currentPage > 1) {
+    fetchResults(currentPage - 1);
+  }
+});
+
+nextPageBtn.addEventListener('click', () => {
+  if (currentPage < totalPages) {
+    fetchResults(currentPage + 1);
+  }
+});
+
+
+async function editResult(resultId) {
+  try {
+    // Fetch the result details from the server
+    const response = await axios.get(`http://localhost:5000/api/results/${resultId}`);
+    const result = response.data;
+
+    // Populate the modal fields with the result data
+    document.getElementById('editResultId').value = result._id;
+    document.getElementById('editPupilName').value = result.pupil.name;
+    document.getElementById('editSubject').value = result.subject.name;
+    document.getElementById('editMarks').value = result.marks;
+    document.getElementById('editTerm').value = result.term;
+    document.getElementById('editAcademicYear').value = result.academicYear.year;
+
+    // Show the modal
+    const editModal = new bootstrap.Modal(document.getElementById('editResultModal'));
+    editModal.show();
+  } catch (error) {
+    console.error('Error fetching result:', error);
+  }
+}
+
+
+// Edit result functionality
+document.getElementById('editResultForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const resultId = document.getElementById('editResultId').value;
+  const updatedMarks = document.getElementById('editMarks').value;
+  const updatedTerm = document.getElementById('editTerm').value;
+
+  try {
+    // Send the updated data to the server
+    await axios.put(`http://localhost:5000/api/results/update/${resultId}`, {
+      marks: updatedMarks,
+      term: updatedTerm,
+    });
+
+    // Close the modal
+    const editModal = bootstrap.Modal.getInstance(document.getElementById('editResultModal'));
+    editModal.hide();
+
+    // Refresh the results table
+    fetchResults();
+  } catch (error) {
+    console.error('Error updating result:', error);
+  }
+});
+
+// Delete result functionality
+async function deleteResult(resultId) {
+  try {
+    // Confirm deletion
+    if (!confirm('Are you sure you want to delete this result?')) {
+      return;
+    }
+
+    // Send DELETE request to the backend
+    const response = await axios.delete(`http://localhost:5000/api/results/delete-result/${resultId}`);
+
+    if (response.status === 200) {
+      alert('Result deleted successfully');
+      // Refresh the results table
+      fetchResults(currentPage);
+    }
+  } catch (error) {
+    console.error('Error deleting result:', error);
+    alert('Failed to delete result. Please try again.');
+  }
+}
+
+
+// Fetch the first page of results when the page loads
+fetchResults();
+

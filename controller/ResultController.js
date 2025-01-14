@@ -79,7 +79,8 @@ exports.getResults = async (req, res) => {
     // Fetch results with pagination
     const results = await Result.find()
       .populate('pupil')  // Populate pupil details
-      .populate('subject')  // Populate subject details
+      .populate('subject')
+      .populate('academicYear')  // Populate subject details
       .skip(skip)  // Skip the records for pagination
       .limit(limit)  // Limit the number of results per page
       .exec();
@@ -97,5 +98,77 @@ exports.getResults = async (req, res) => {
   } catch (error) {
     console.error('Error fetching results:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+exports.getSIngleResult = async (req, res) => {
+  try {
+    const resultId = req.params.resultId;
+    const result = await Result.findById(resultId)
+      .populate('pupil', 'name') // Assuming `pupil` is a reference
+      .populate('subject', 'name') // Assuming `subject` is a reference
+      .populate('academicYear', 'year'); // Assuming `academicYear` is a reference
+
+    if (!result) {
+      return res.status(404).json({ message: 'Result not found' });
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching result:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+exports.updateResult = async (req, res) => {
+  try {
+    const resultId = req.params.resultId;
+    const { marks, term } = req.body;
+
+    // Validate input
+    if (marks < 0 || marks > 100) {
+      return res.status(400).json({ message: 'Marks must be between 0 and 100' });
+    }
+
+    // Calculate grade based on marks
+    const grade = calculateGrade(marks);
+
+    // Update the result with the new marks and grade
+    const updatedResult = await Result.findByIdAndUpdate(
+      resultId,
+      { marks, term, grade },
+      { new: true }
+    )
+      .populate('pupil', 'name')
+      .populate('subject', 'name')
+      .populate('academicYear', 'year');
+
+    if (!updatedResult) {
+      return res.status(404).json({ message: 'Result not found' });
+    }
+
+    res.json({ message: 'Result updated successfully', result: updatedResult });
+  } catch (error) {
+    console.error('Error updating result:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+// Delete Result
+exports.deleteResult = async (req, res) => {
+  try {
+    const resultId = req.params.id;
+
+    // Find and delete the result
+    const deletedResult = await Result.findByIdAndDelete(resultId);
+
+    if (!deletedResult) {
+      return res.status(404).json({ message: 'Result not found' });
+    }
+
+    res.status(200).json({ message: 'Result deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting result:', error);
+    res.status(500).json({ message: 'An error occurred while deleting the result' });
   }
 };

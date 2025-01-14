@@ -13,7 +13,7 @@ const ResultSchema = new mongoose.Schema({
   },
   academicYear: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'AcademicYear',
+    ref: 'academicYear',
     required: true,
   },
   term: {
