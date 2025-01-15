@@ -39,8 +39,8 @@ app.use('/uploads/passports', express.static(path.join(__dirname, 'uploads/passp
 app.use("/", express.static(path.join(__dirname +'/public'))); 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/pupil', pupilRoutes);
+app.use('/api/admin', adminRoutes); 
+app.use('/api/pupil', pupilRoutes); 
 app.use('/api/results', resultRoutes);
 
 // MongoDB connection

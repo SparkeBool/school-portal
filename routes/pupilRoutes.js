@@ -1,7 +1,7 @@
 const express = require('express');
 const authMiddleware = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
-const { uploadPassport, getPupil, updatePupilProfile } = require('../controller/pupilController');
+const { uploadPassport, getPupil, updatePupilProfile } = require('../controller/PupilController');
 
 const router = express.Router();
 
